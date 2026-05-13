@@ -74,6 +74,28 @@ public class FrcRobotBase extends SubsystemBase
      */
     public static class RobotInfo
     {
+        @FunctionalInterface
+        public interface DriveMotorFactory {
+            TrcMotor create(String name, int id, boolean inverted);
+        }
+
+        @FunctionalInterface
+        public interface ImuFactory {
+            TrcGyro create(RobotInfo info);
+        }
+
+        public DriveMotorFactory driveMotorFactory = null;
+        public ImuFactory imuFactory = null;
+
+        public RobotInfo setDriveMotorFactory(DriveMotorFactory factory) {
+            this.driveMotorFactory = factory;
+            return this;
+        }
+
+        public RobotInfo setImuFactory(ImuFactory factory) {
+            this.imuFactory = factory;
+            return this;
+        }
         public String robotName = null;
         // Robot Characteristics.
         public double robotWidth = 0.0, robotLength = 0.0;
@@ -504,31 +526,39 @@ public class FrcRobotBase extends SubsystemBase
     {
         super();
         this.robotInfo = robotInfo;
-        imu = robotInfo.imuName != null? createIMU(robotInfo) : null;
+        imu = robotInfo.imuFactory != null
+            ? robotInfo.imuFactory.create(robotInfo)
+            : (robotInfo.imuName != null ? createIMU(robotInfo) : null);
         driveMotors = new TrcMotor[robotInfo.driveMotorNames.length];
-        for (int i = 0; i < driveMotors.length; i++)
-        {
-            FrcMotorActuator.Params motorParams= new FrcMotorActuator.Params()
-                .setPrimaryMotor(
-                    robotInfo.driveMotorNames[i], robotInfo.driveMotorType, robotInfo.driveMotorInverted[i], true,
-                    true, robotInfo.driveMotorIds[i], robotInfo.driveMotorCanBusName,
-                    robotInfo.driveMotorSparkMaxParams);
-            driveMotors[i] = new FrcMotorActuator(motorParams).getMotor();
+        for (int i = 0; i < driveMotors.length; i++) {
+            if (robotInfo.driveMotorFactory != null) {
+                driveMotors[i] = robotInfo.driveMotorFactory.create(
+                    robotInfo.driveMotorNames[i],
+                    robotInfo.driveMotorIds[i],
+                    robotInfo.driveMotorInverted[i]);
+            } else {
+                FrcMotorActuator.Params motorParams= new FrcMotorActuator.Params()
+                    .setPrimaryMotor(
+                        robotInfo.driveMotorNames[i], robotInfo.driveMotorType, robotInfo.driveMotorInverted[i], true,
+                        true, robotInfo.driveMotorIds[i], robotInfo.driveMotorCanBusName,
+                        robotInfo.driveMotorSparkMaxParams);
+                driveMotors[i] = new FrcMotorActuator(motorParams).getMotor();
 
-            if (robotInfo.driveMotorPosScale != null)
-            {
-                // Only set it if provided. For example, WpiOdometry needs this.
-                driveMotors[i].setPositionSensorScaleAndOffset(robotInfo.driveMotorPosScale, 0.0);
-            }
+                if (robotInfo.driveMotorPosScale != null)
+                {
+                    // Only set it if provided. For example, WpiOdometry needs this.
+                    driveMotors[i].setPositionSensorScaleAndOffset(robotInfo.driveMotorPosScale, 0.0);
+                }
 
-            if (robotInfo.baseParams.driveMotorVelPidCoeffs != null)
-            {
-                driveMotors[i].setVelocityPidParameters(
-                    new PidParams()
-                        .setPidCoefficients(robotInfo.baseParams.driveMotorVelPidCoeffs)
-                        .setFFCoefficients(robotInfo.baseParams.driveMotorVelFFCoeffs)
-                        .setPidControlParams(robotInfo.baseParams.drivePidTolerance, false),
-                    null);
+                if (robotInfo.baseParams.driveMotorVelPidCoeffs != null)
+                {
+                    driveMotors[i].setVelocityPidParameters(
+                        new PidParams()
+                            .setPidCoefficients(robotInfo.baseParams.driveMotorVelPidCoeffs)
+                            .setFFCoefficients(robotInfo.baseParams.driveMotorVelFFCoeffs)
+                            .setPidControlParams(robotInfo.baseParams.drivePidTolerance, false),
+                        null);
+                }
             }
         }
     }   //FrcRobotBase

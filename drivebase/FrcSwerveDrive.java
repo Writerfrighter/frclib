@@ -651,4 +651,42 @@ public class FrcSwerveDrive extends TrcSwerveDrive implements TrcDriveBaseOdomet
         return new TrcPose2D(xVel, yVel, turnVel);
     }   //getVelocity
 
+    /**
+     * This method returns the current swerve module states in WPILib units.
+     *
+     * @return array of swerve module states (m/s, Rotation2d).
+     */
+    public SwerveModuleState[] getCurrentModuleStates()
+    {
+        SwerveModuleState[] currentStates = new SwerveModuleState[4];
+        for (int i = 0; i < currentStates.length; i++)
+        {
+            TrcSwerveModule module = swerveModules[i];
+            double driveVelMps = Units.inchesToMeters(module.driveMotor.getVelocity());
+            currentStates[i] = new SwerveModuleState(driveVelMps, Rotation2d.fromDegrees(-module.getSteerAngle()));
+        }
+
+        return currentStates;
+    }   //getCurrentModuleStates
+
+    /**
+     * This method returns the current chassis speeds in WPILib units.
+     *
+     * @return chassis speeds (m/s, rad/s).
+     */
+    public ChassisSpeeds getCurrentChassisSpeeds()
+    {
+        return kinematics.toChassisSpeeds(getCurrentModuleStates());
+    }   //getCurrentChassisSpeeds
+
+    /**
+     * This method returns the current robot rotation.
+     *
+     * @return robot rotation as Rotation2d.
+     */
+    public Rotation2d getCurrentRotation()
+    {
+        return Rotation2d.fromDegrees(gyro != null? -gyro.getZHeading().value: 0.0);
+    }   //getCurrentRotation
+
 }   //class FrcSwerveDriveBase
