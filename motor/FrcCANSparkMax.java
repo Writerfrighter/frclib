@@ -101,7 +101,6 @@ public class FrcCANSparkMax extends TrcMotor
         super(instanceName, sensors);
         motor = new SparkMax(canId, brushless? MotorType.kBrushless: MotorType.kBrushed);
         pidCtrl = motor.getClosedLoopController();
-        resetFactoryDefault();
     }   //FrcCANSparkMax
 
     /**

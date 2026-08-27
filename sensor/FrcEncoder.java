@@ -67,7 +67,7 @@ public class FrcEncoder extends Encoder implements TrcEncoder
         {
             case CANCoder:
                 FrcCANCoder canCoder = new FrcCANCoder(encoderName, encoderId, canBusName);
-                canCoder.resetFactoryDefault();
+                // canCoder.resetFactoryDefault();
                 canCoder.setInverted(inverted);
                 canCoder.setAbsoluteRange(true);
                 // CANCoder is already normalized to the range of 0 to 1.0 for a revolution
@@ -78,7 +78,7 @@ public class FrcEncoder extends Encoder implements TrcEncoder
 
             case Canandmag:
                 FrcCanandmag canandmag = new FrcCanandmag(encoderName, encoderId, canBusName);
-                canandmag.resetFactoryDefaults(false);
+                // canandmag.resetFactoryDefaults(false);
                 canandmag.setInverted(inverted);
                 // Canandmag is already normalized to the range of 0 to 1.0 for a revolution (revolution per count).
                 canandmag.setScaleAndOffset(1.0, 0.0, 0.0);

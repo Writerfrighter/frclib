@@ -438,12 +438,12 @@ public class FrcMotorActuator
         {
             case CanTalonFx:
                 motor = new FrcCANTalonFX(motorInfo.name, motorInfo.motorId, motorInfo.canBusName, sensors);
-                motor.resetFactoryDefault();
+                // motor.resetFactoryDefault();
                 break;
             
             case CanTalonSrx:
                 motor = new FrcCANTalonSRX(motorInfo.name, motorInfo.motorId, sensors);
-                motor.resetFactoryDefault();
+                // motor.resetFactoryDefault();
                 break;
 
             case CanSparkMax:
@@ -451,7 +451,7 @@ public class FrcMotorActuator
                     motorInfo.name, motorInfo.motorId,
                     motorInfo.sparkMaxParams != null && motorInfo.sparkMaxParams.brushless,
                     sensors);
-                motor.resetFactoryDefault();
+                // motor.resetFactoryDefault();
                 break;
 
             case PwmTalonFx:
