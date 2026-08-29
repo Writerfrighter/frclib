@@ -278,6 +278,11 @@ public class FrcRelay extends Relay implements TrcExclusiveSubsystem
      */
     public void set(String owner, double delay, Value value, double duration, TrcEvent completionEvent)
     {
+        if (completionEvent != null)
+        {
+            completionEvent.clear();
+        }
+
         TrcEvent releaseOwnershipEvent = acquireOwnership(owner, completionEvent, null);
         if (releaseOwnershipEvent != null) completionEvent = releaseOwnershipEvent;
 
